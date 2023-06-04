@@ -20,6 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import pe.edu.cibertec.restaurantcompose.data.model.User
+import pe.edu.cibertec.restaurantcompose.data.remote.ApiClient
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +67,25 @@ fun Login() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp, 0.dp, 8.dp, 0.dp),
-            onClick = { }) {
+            onClick = {
+                val userInterface = ApiClient.getUserInterface()
+
+                val createUser = userInterface.createUser(User("Prueba", "Password"))
+
+                createUser.enqueue(object: Callback<User>{
+                    override fun onResponse(call: Call<User>, response: Response<User>) {
+                        if (response.isSuccessful) {
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<User>, t: Throwable) {
+                        TODO("Not yet implemented")
+                    }
+
+                })
+
+            }) {
             Text(text = "Sign up")
         }
         TextButton(
