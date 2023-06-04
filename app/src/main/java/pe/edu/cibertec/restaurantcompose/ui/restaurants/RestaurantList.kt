@@ -71,13 +71,12 @@ fun RestaurantList() {
 
                 Box(
                     modifier = Modifier
-                        .padding(8.dp)
                         .background(
                             color = MaterialTheme.colorScheme.onPrimary,
-                            shape = RoundedCornerShape(2.dp)
+                            shape = RoundedCornerShape(8.dp)
                         )
                 ) {
-                    Text(text = restaurant.title)
+                    Text(text = restaurant.title, modifier = Modifier.padding(8.dp))
                 }
             }
         }
