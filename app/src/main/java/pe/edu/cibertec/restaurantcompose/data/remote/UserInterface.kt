@@ -12,5 +12,6 @@ interface UserInterface {
     @POST("users")
     fun createUser(@Body user: User): Call<User>
 
-
+    @DELETE("users/{id}")
+    fun deleteUser(@Path("id") userId: Int ): Call<User>
 }

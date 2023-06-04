@@ -1,5 +1,6 @@
 package pe.edu.cibertec.restaurantcompose.ui.restaurants
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -60,7 +61,25 @@ fun Login() {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp, 0.dp, 8.dp, 0.dp),
-            onClick = { }) {
+            onClick = {
+                val userInterface = ApiClient.getUserInterface()
+
+                val deleteUser = userInterface.deleteUser(13)
+
+                deleteUser.enqueue(object : Callback<User> {
+                    override fun onResponse(call: Call<User>, response: Response<User>) {
+                        if (response.isSuccessful) {
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<User>, t: Throwable) {
+                        t.message?.let { Log.d("RestaurantList", it) }
+
+                    }
+
+                })
+            }) {
             Text(text = "Sign in")
         }
         Button(
@@ -72,7 +91,7 @@ fun Login() {
 
                 val createUser = userInterface.createUser(User("Prueba", "Password"))
 
-                createUser.enqueue(object: Callback<User>{
+                createUser.enqueue(object : Callback<User> {
                     override fun onResponse(call: Call<User>, response: Response<User>) {
                         if (response.isSuccessful) {
 
@@ -80,7 +99,8 @@ fun Login() {
                     }
 
                     override fun onFailure(call: Call<User>, t: Throwable) {
-                        TODO("Not yet implemented")
+                        t.message?.let { Log.d("RestaurantList", it) }
+
                     }
 
                 })
