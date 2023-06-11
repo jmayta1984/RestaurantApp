@@ -6,12 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import pe.edu.cibertec.restaurantcompose.ui.restaurants.Login
-import pe.edu.cibertec.restaurantcompose.ui.restaurants.RestaurantList
+import pe.edu.cibertec.restaurantcompose.ui.login.Login
+import pe.edu.cibertec.restaurantcompose.ui.signup.SignUp
 import pe.edu.cibertec.restaurantcompose.ui.theme.RestaurantComposeTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Login()
+                    SignUp()
                 }
             }
         }
