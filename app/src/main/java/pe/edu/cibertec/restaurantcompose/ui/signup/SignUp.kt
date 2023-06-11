@@ -1,6 +1,7 @@
 package pe.edu.cibertec.restaurantcompose.ui.signup
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,11 +31,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import pe.edu.cibertec.restaurantcompose.data.model.User
 import pe.edu.cibertec.restaurantcompose.data.remote.ApiClient
 import pe.edu.cibertec.restaurantcompose.ui.theme.RestaurantComposeTheme
@@ -44,7 +48,7 @@ import retrofit2.Response
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SignUp() {
+fun SignUp(navController: NavController) {
 
     val username = remember {
         mutableStateOf(TextFieldValue())
@@ -61,6 +65,7 @@ fun SignUp() {
         mutableStateOf(false)
     }
 
+    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -150,22 +155,50 @@ fun SignUp() {
             onClick = {
                 val userInterface = ApiClient.getUserInterface()
 
-                val createUser =
-                    userInterface.createUser(User(username.value.text, password.value.text))
+                val validateUser = userInterface.validateUser(username.value.text)
 
-                createUser.enqueue(object : Callback<User> {
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
-                        if (response.isSuccessful) {
+                validateUser.enqueue(object: Callback<List<User>>{
+                    override fun onResponse(
+                        call: Call<List<User>>,
+                        response: Response<List<User>>
+                    ) {
+                        if (response.isSuccessful){
+                            Log.d("SignUp", response.body()!!.toString())
+                            if (response.body()!!.isEmpty()){
+                                Toast.makeText(context, "Nuevo usuario", Toast.LENGTH_SHORT).show()
+                                val createUser =
+                                    userInterface.createUser(User(username.value.text, password.value.text))
 
+                                createUser.enqueue(object : Callback<User> {
+                                    override fun onResponse(call: Call<User>, response: Response<User>) {
+                                        if (response.isSuccessful) {
+                                            navController.navigate("restaurants")
+
+                                        }
+                                    }
+
+                                    override fun onFailure(call: Call<User>, t: Throwable) {
+                                        t.message?.let { Log.d("RestaurantList", it) }
+
+                                    }
+
+                                })
+
+                            } else {
+                                Toast.makeText(context, "Usuario ya registrado", Toast.LENGTH_SHORT).show()
+
+                            }
                         }
                     }
 
-                    override fun onFailure(call: Call<User>, t: Throwable) {
-                        t.message?.let { Log.d("RestaurantList", it) }
-
+                    override fun onFailure(call: Call<List<User>>, t: Throwable) {
+                        TODO("Not yet implemented")
                     }
 
                 })
+
+
+
 
             }) {
             Text(text = "Sign up")
@@ -175,6 +208,7 @@ fun SignUp() {
                 .fillMaxWidth()
                 .padding(8.dp, 0.dp, 8.dp, 0.dp),
             onClick = {
+                navController.navigate("login")
 
             }) {
             Text(text = "Sign in")
@@ -190,6 +224,6 @@ fun SignUp() {
 @Composable
 fun SignUpPreview() {
     RestaurantComposeTheme {
-        SignUp()
+        SignUp(navController = rememberNavController())
     }
 }

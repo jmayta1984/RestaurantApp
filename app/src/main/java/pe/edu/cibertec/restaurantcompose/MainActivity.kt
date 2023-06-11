@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import pe.edu.cibertec.restaurantcompose.ui.Home
 import pe.edu.cibertec.restaurantcompose.ui.login.Login
 import pe.edu.cibertec.restaurantcompose.ui.signup.SignUp
 import pe.edu.cibertec.restaurantcompose.ui.theme.RestaurantComposeTheme
@@ -21,7 +22,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SignUp()
+                    Home()
                 }
             }
         }
