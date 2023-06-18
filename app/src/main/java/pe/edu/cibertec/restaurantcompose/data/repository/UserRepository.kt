@@ -13,17 +13,27 @@ class UserRepository(
 ) {
 
     fun login(username: String, password: String, callback: (Result<Boolean>) -> Unit) {
+
+
         userService.login(username, password).enqueue(object : Callback<List<User>> {
+
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
 
-                if (response.isSuccessful && response.body() != null) {
-                    if (response.body()!!.isNotEmpty()) {
-                        callback(Result.Success(true))
-                    } else {
-                        callback(Result.Error("Login incorrect"))
-                    }
-                } else
-                    callback(Result.Error("Data not found"))
+                if (!response.isSuccessful) {
+                    callback(Result.Error("Unsuccessful response"))
+                    return
+                }
+
+                if (response.body() == null) {
+                    callback(Result.Error("No data found"))
+                    return
+                }
+
+                if (response.body()!!.isEmpty()) {
+                    callback(Result.Error("Wrong credentials"))
+                    return
+                }
+                callback(Result.Success(true))
             }
 
             override fun onFailure(call: Call<List<User>>, t: Throwable) {
@@ -33,20 +43,29 @@ class UserRepository(
         })
     }
 
-    private fun validateUser(username: String, callback: (Result<Boolean>) -> Unit){
+    private fun validateUser(username: String, callback: (Result<Boolean>) -> Unit) {
 
-        userService.validateUser(username).enqueue(object: Callback<List<User>>{
+        userService.validateUser(username).enqueue(object : Callback<List<User>> {
 
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
 
-                if (response.isSuccessful && response.body() != null) {
-                    if (response.body()!!.isEmpty()) {
-                        callback(Result.Success(true))
-                    } else {
-                        callback(Result.Error("Username already registered", false))
-                    }
-                } else
-                    callback(Result.Error("Data not found"))
+                if (!response.isSuccessful) {
+                    callback(Result.Error("Unsuccessful response"))
+                    return
+                }
+
+                if (response.body() == null) {
+                    callback(Result.Error("No data found"))
+                    return
+                }
+
+                if (response.body()!!.isNotEmpty()) {
+                    callback(Result.Error("Username already registered"))
+                    return
+                }
+
+                callback(Result.Success(true))
+
             }
 
             override fun onFailure(call: Call<List<User>>, t: Throwable) {
@@ -55,25 +74,46 @@ class UserRepository(
         })
     }
 
-    fun createUser(username: String, password: String, callback: (Result<Boolean>) -> Unit) {
-        validateUser(username){result ->
-            if (result is Result.Success) {
-                userService.createUser(User(username, password)).enqueue(object: Callback<User>{
-                    override fun onResponse(call: Call<User>, response: Response<User>) {
-                        if (response.isSuccessful && response.body() != null){
-                            callback(Result.Success(true))
-                        }
+    fun createUser(
+        username: String,
+        password: String,
+        confirmPassword: String,
+        callback: (Result<Boolean>) -> Unit
+    ) {
+
+        if (password != confirmPassword) {
+            callback(Result.Error("Passwords don't match"))
+            return
+        }
+
+        validateUser(username) { result ->
+
+            if (result is Result.Error) {
+                callback(Result.Error(result.message.toString()))
+                return@validateUser
+            }
+
+            userService.createUser(User(username, password)).enqueue(object : Callback<User> {
+                override fun onResponse(call: Call<User>, response: Response<User>) {
+                    if (!response.isSuccessful) {
+                        callback(Result.Error("Unsuccessful response"))
+                        return
                     }
 
-                    override fun onFailure(call: Call<User>, t: Throwable) {
-                        callback(Result.Error("Create user not available"))
+                    if (response.body() == null) {
+                        callback(Result.Error("No data found"))
+                        return
                     }
-                })
-            } else {
-                callback(Result.Error(result.message.toString()))
-            }
+                    callback(Result.Success(true))
+
+                }
+
+                override fun onFailure(call: Call<User>, t: Throwable) {
+                    callback(Result.Error("Create user not available"))
+                }
+            })
+
         }
     }
-
 
 }

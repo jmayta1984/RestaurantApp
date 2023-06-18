@@ -98,7 +98,7 @@ fun Login(navController: NavController) {
                     onClick = {
                         showPassword.value = !showPassword.value
                     }) {
-                    if (!showPassword.value) {
+                    if (showPassword.value) {
                         Icon(Icons.Default.Visibility, null)
                     } else {
                         Icon(Icons.Default.VisibilityOff, null)
