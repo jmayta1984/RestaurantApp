@@ -19,13 +19,16 @@ class RestaurantRepository(
                 call: Call<List<Restaurant>>,
                 response: Response<List<Restaurant>>
             ) {
-                if (response.isSuccessful && response.body() != null) {
-
-                    callback(Result.Success(response.body()!!))
-                } else {
-                    callback(Result.Error("No data found"))
+                if (!response.isSuccessful) {
+                    callback(Result.Error("Unsuccessful response"))
+                    return
                 }
 
+                if (response.body() == null) {
+                    callback(Result.Error("No data found"))
+                    return
+                }
+                callback(Result.Success(response.body()!!))
             }
 
             override fun onFailure(call: Call<List<Restaurant>>, t: Throwable) {
