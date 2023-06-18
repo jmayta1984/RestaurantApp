@@ -9,22 +9,28 @@ import pe.edu.cibertec.restaurantcompose.ui.restaurants.RestaurantList
 import pe.edu.cibertec.restaurantcompose.ui.signup.SignUp
 
 @Composable
-fun Home(){
+fun Home() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "login" ){
+    NavHost(navController = navController, startDestination = Route.Login.route) {
 
-        composable("register"){
+        composable(Route.SignUp.route) {
             SignUp(navController)
         }
 
-        composable(("restaurants")){
+        composable(Route.Restaurants.route) {
             RestaurantList(navController)
         }
 
-        composable("login"){
+        composable(Route.Login.route) {
             Login(navController)
         }
 
     }
+}
+
+sealed class Route(val route: String) {
+    object Login : Route("login")
+    object Restaurants : Route("restaurants")
+    object SignUp : Route("sign_up")
 }

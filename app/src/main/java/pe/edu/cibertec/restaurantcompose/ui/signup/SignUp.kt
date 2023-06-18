@@ -41,6 +41,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import pe.edu.cibertec.restaurantcompose.data.model.User
 import pe.edu.cibertec.restaurantcompose.data.remote.ApiClient
+import pe.edu.cibertec.restaurantcompose.ui.Route
 import pe.edu.cibertec.restaurantcompose.ui.theme.RestaurantComposeTheme
 import retrofit2.Call
 import retrofit2.Callback
@@ -172,7 +173,7 @@ fun SignUp(navController: NavController) {
                                 createUser.enqueue(object : Callback<User> {
                                     override fun onResponse(call: Call<User>, response: Response<User>) {
                                         if (response.isSuccessful) {
-                                            navController.navigate("restaurants")
+                                            navController.navigate(Route.Restaurants.route)
 
                                         }
                                     }
@@ -208,7 +209,7 @@ fun SignUp(navController: NavController) {
                 .fillMaxWidth()
                 .padding(8.dp, 0.dp, 8.dp, 0.dp),
             onClick = {
-                navController.navigate("login")
+                navController.navigate(Route.Login.route)
 
             }) {
             Text(text = "Sign in")
