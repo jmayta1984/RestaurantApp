@@ -1,6 +1,5 @@
 package pe.edu.cibertec.restaurantcompose.ui.restaurants
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -23,12 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import pe.edu.cibertec.restaurantcompose.data.model.Restaurant
-import pe.edu.cibertec.restaurantcompose.data.remote.ApiClient
 import pe.edu.cibertec.restaurantcompose.data.repository.RestaurantRepository
 import pe.edu.cibertec.restaurantcompose.util.Result
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 @Composable
 fun RestaurantList(navController: NavController) {

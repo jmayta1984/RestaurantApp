@@ -20,6 +20,7 @@ class RestaurantRepository(
                 response: Response<List<Restaurant>>
             ) {
                 if (response.isSuccessful && response.body() != null) {
+
                     callback(Result.Success(response.body()!!))
                 } else {
                     callback(Result.Error("No data found"))
