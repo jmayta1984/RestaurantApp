@@ -41,8 +41,10 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import pe.edu.cibertec.restaurantcompose.data.model.User
 import pe.edu.cibertec.restaurantcompose.data.remote.ApiClient
+import pe.edu.cibertec.restaurantcompose.data.repository.UserRepository
 import pe.edu.cibertec.restaurantcompose.ui.Route
 import pe.edu.cibertec.restaurantcompose.ui.theme.RestaurantComposeTheme
+import pe.edu.cibertec.restaurantcompose.util.Result
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -67,6 +69,9 @@ fun SignUp(navController: NavController) {
     }
 
     val context = LocalContext.current
+
+    val userRepository = UserRepository()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -154,53 +159,13 @@ fun SignUp(navController: NavController) {
                 .fillMaxWidth()
                 .padding(8.dp, 0.dp, 8.dp, 0.dp),
             onClick = {
-                val userInterface = ApiClient.getUserInterface()
-
-                val validateUser = userInterface.validateUser(username.value.text)
-
-                validateUser.enqueue(object: Callback<List<User>>{
-                    override fun onResponse(
-                        call: Call<List<User>>,
-                        response: Response<List<User>>
-                    ) {
-                        if (response.isSuccessful){
-                            Log.d("SignUp", response.body()!!.toString())
-                            if (response.body()!!.isEmpty()){
-                                Toast.makeText(context, "Nuevo usuario", Toast.LENGTH_SHORT).show()
-                                val createUser =
-                                    userInterface.createUser(User(username.value.text, password.value.text))
-
-                                createUser.enqueue(object : Callback<User> {
-                                    override fun onResponse(call: Call<User>, response: Response<User>) {
-                                        if (response.isSuccessful) {
-                                            navController.navigate(Route.Restaurants.route)
-
-                                        }
-                                    }
-
-                                    override fun onFailure(call: Call<User>, t: Throwable) {
-                                        t.message?.let { Log.d("RestaurantList", it) }
-
-                                    }
-
-                                })
-
-                            } else {
-                                Toast.makeText(context, "Usuario ya registrado", Toast.LENGTH_SHORT).show()
-
-                            }
-                        }
+                userRepository.createUser(username.value.text, password.value.text){result ->
+                    if (result is Result.Success){
+                        navController.navigate(Route.Restaurants.route)
+                    } else {
+                        Toast.makeText(context, result.message.toString(), Toast.LENGTH_SHORT).show()
                     }
-
-                    override fun onFailure(call: Call<List<User>>, t: Throwable) {
-                        TODO("Not yet implemented")
-                    }
-
-                })
-
-
-
-
+                }
             }) {
             Text(text = "Sign up")
         }

@@ -1,5 +1,6 @@
 package pe.edu.cibertec.restaurantcompose.ui.login
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
@@ -35,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import pe.edu.cibertec.restaurantcompose.data.repository.UserRepository
 import pe.edu.cibertec.restaurantcompose.ui.Route
 import pe.edu.cibertec.restaurantcompose.ui.theme.RestaurantComposeTheme
+import pe.edu.cibertec.restaurantcompose.util.Result
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +55,8 @@ fun Login(navController: NavController) {
     }
 
     val userRepository = UserRepository()
+
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -109,9 +114,12 @@ fun Login(navController: NavController) {
                 .fillMaxWidth()
                 .padding(8.dp, 0.dp, 8.dp, 0.dp),
             onClick = {
-                userRepository.login(username.value.text, password.value.text){result ->
-                    if (result) {
+                userRepository.login(username.value.text, password.value.text) { result ->
+                    if (result is Result.Success) {
                         navController.navigate(Route.Restaurants.route)
+                    } else {
+                        Toast.makeText(context, result.message.toString(), Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             }) {

@@ -1,6 +1,7 @@
 package pe.edu.cibertec.restaurantcompose.ui.restaurants
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,11 +18,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import pe.edu.cibertec.restaurantcompose.data.model.Restaurant
 import pe.edu.cibertec.restaurantcompose.data.remote.ApiClient
+import pe.edu.cibertec.restaurantcompose.data.repository.RestaurantRepository
+import pe.edu.cibertec.restaurantcompose.util.Result
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -33,27 +37,16 @@ fun RestaurantList(navController: NavController) {
         mutableStateOf(listOf<Restaurant>())
     }
 
-    val restaurantInterface = ApiClient.getRestaurantInterface()
-    val getRestaurants = restaurantInterface.getRestaurants()
+    val restaurantRepository = RestaurantRepository()
+    val context = LocalContext.current
 
-    getRestaurants.enqueue(object : Callback<List<Restaurant>> {
-        override fun onResponse(
-            call: Call<List<Restaurant>>,
-            response: Response<List<Restaurant>>
-        ) {
-            if (response.isSuccessful) {
-                if (response.body() == null) {
-                    restaurants.value = emptyList()
-                } else {
-                    restaurants.value = response.body()!!
-                }
-            }
+    restaurantRepository.getRestaurants { result ->
+        if (result is Result.Success ){
+            restaurants.value = result.data!!
+        } else {
+            Toast.makeText(context, result.message.toString(), Toast.LENGTH_SHORT).show()
         }
-
-        override fun onFailure(call: Call<List<Restaurant>>, t: Throwable) {
-            t.message?.let { Log.d("RestaurantList", it) }
-        }
-    })
+    }
 
     LazyColumn {
         items(restaurants.value) { restaurant ->
